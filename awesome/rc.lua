@@ -19,6 +19,7 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 require("awful.hotkeys_popup.keys")
 
 local bindings = require("bindings")
+local tags = require("tags")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -101,25 +102,6 @@ mymainmenu = awful.menu({
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
 
-
--- Create a wibox for each screen and add it
-local taglist_buttons = gears.table.join(
-	awful.button({}, 1, function(t) t:view_only() end),
-	awful.button({ modkey }, 1, function(t)
-		if client.focus then
-			client.focus:move_to_tag(t)
-		end
-	end),
-	awful.button({}, 3, awful.tag.viewtoggle),
-	awful.button({ modkey }, 3, function(t)
-		if client.focus then
-			client.focus:toggle_tag(t)
-		end
-	end),
-	awful.button({}, 4, function(t) awful.tag.viewnext(t.screen) end),
-	awful.button({}, 5, function(t) awful.tag.viewprev(t.screen) end)
-)
-
 local function set_wallpaper(s)
 	-- Wallpaper
 	if beautiful.wallpaper then
@@ -143,95 +125,15 @@ awful.screen.connect_for_each_screen(function(s)
 	-- Each screen has its own tag table.
 	awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
-	local mytaglist = awful.widget.taglist {
-		screen  = s,
-		filter  = awful.widget.taglist.filter.all,
-		buttons = taglist_buttons
-	}
-	local mywibox = bar_widget.bar(s, taglist_buttons)
+	local mywibox = bar_widget.bar(s, tags.taglist_buttons)
 
 	s.mywibox = mywibox
 end)
 -- }}}
 
--- {{{ Mouse bindings
-root.buttons(gears.table.join(
-	awful.button({}, 3, function() mymainmenu:toggle() end),
-	awful.button({}, 4, awful.tag.viewnext),
-	awful.button({}, 5, awful.tag.viewprev)
-))
--- }}}
 
--- {{{ Key bindings
-local globalkeys = bindings.globalkeys
-
--- Bind all key numbers to tags.
--- Be careful: we use keycodes to make it work on any keyboard layout.
--- This should map on the top row of your keyboard, usually 1 to 9.
-for i = 1, 9 do
-	globalkeys = gears.table.join(globalkeys,
-		-- View tag only.
-		awful.key({ modkey }, "#" .. i + 9,
-			function()
-				local screen = awful.screen.focused()
-				local tag = screen.tags[i]
-				if tag then
-					tag:view_only()
-				end
-			end,
-			{ description = "view tag #" .. i, group = "tag" }),
-		-- Toggle tag display.
-		awful.key({ modkey, "Control" }, "#" .. i + 9,
-			function()
-				local screen = awful.screen.focused()
-				local tag = screen.tags[i]
-				if tag then
-					awful.tag.viewtoggle(tag)
-				end
-			end,
-			{ description = "toggle tag #" .. i, group = "tag" }),
-		-- Move client to tag.
-		awful.key({ modkey, "Shift" }, "#" .. i + 9,
-			function()
-				if client.focus then
-					local tag = client.focus.screen.tags[i]
-					if tag then
-						client.focus:move_to_tag(tag)
-					end
-				end
-			end,
-			{ description = "move focused client to tag #" .. i, group = "tag" }),
-		-- Toggle tag on focused client.
-		awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
-			function()
-				if client.focus then
-					local tag = client.focus.screen.tags[i]
-					if tag then
-						client.focus:toggle_tag(tag)
-					end
-				end
-			end,
-			{ description = "toggle focused client on tag #" .. i, group = "tag" })
-	)
-end
-
-clientbuttons = gears.table.join(
-	awful.button({}, 1, function(c)
-		c:emit_signal("request::activate", "mouse_click", { raise = true })
-	end),
-	awful.button({ modkey }, 1, function(c)
-		c:emit_signal("request::activate", "mouse_click", { raise = true })
-		awful.mouse.client.move(c)
-	end),
-	awful.button({ modkey }, 3, function(c)
-		c:emit_signal("request::activate", "mouse_click", { raise = true })
-		awful.mouse.client.resize(c)
-	end)
-)
-
--- Set jeys
-root.keys(globalkeys)
--- }}}
+root.buttons(bindings.globalbuttons)
+root.keys(bindings.globalkeys)
 
 -- {{{ Rules
 -- Rules to apply to new clients (through the "manage" signal).
@@ -245,17 +147,11 @@ awful.rules.rules = {
 			focus = awful.client.focus.filter,
 			raise = true,
 			keys = bindings.clientkeys,
-			buttons = clientbuttons,
+			buttons = bindings.clientbuttons,
 			screen = awful.screen.preferred,
 			placement = awful.placement.no_overlap + awful.placement.no_offscreen
 		}
 	},
-
-
-
-	-- Set Firefox to always map on the tag named "2" on screen 1.
-	-- { rule = { class = "Firefox" },
-	--   properties = { screen = 1, tag = "2" } },
 }
 -- }}}
 
