@@ -46,7 +46,7 @@ theme.titlebar_bg_focus                         = "#3F3F3F"
 theme.titlebar_bg_normal                        = "#3F3F3F"
 -- }}}
 
-theme.notification_max_height                   = dpi(40)
+-- theme.notification_max_height                   = dpi(40)
 theme.notification_border_color                 = "#4287f5"
 theme.notification_bg                           = "#0855cf"
 theme.notification_opacity                      = 0.8
