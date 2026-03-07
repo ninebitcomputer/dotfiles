@@ -52,7 +52,8 @@ let s:voidRed = {'gui': '#821A1A', 'cterm256': '1'}
 let s:voidRed2 = {'gui': '#FF0000', 'cterm256': '196'}
 let s:none = {'gui': 'NONE', 'cterm256': 'NONE'}
 
-let s:cPage = {'gui': '#fbf1c7', 'cterm256': '252'}
+" BACKGROUND
+let s:cPage = {'gui': '#fdf6e3', 'cterm256': '252'}
 
 " ==========================
 " Definitions
